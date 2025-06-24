@@ -44,8 +44,8 @@ services:
     container_name: ams-front
     image: llhwanll/ams-front:latest
     environment:
-      - REACT_APP_API_URL=${REACT_API_URL}
-      - REACT_APP_LANG=${REACT_APP_LANG}
+      - REACT_APP_API_URL=http://192.168.9.197:8888
+      - REACT_APP_LANG=ko
     ports:
       - "3000:80"
     networks:
@@ -59,8 +59,8 @@ services:
     image: hoonseung/asset-management:latest
 
     depends_on:
-      - ams-redis
-      - ams-postgres
+      - postgres
+      - redis
 
     
     environment:
