@@ -1,5 +1,5 @@
 services:
-  ams-postgres:
+  postgres:
     container_name: ams-postgres
     image: postgres:14.4
     ports:
@@ -22,7 +22,7 @@ services:
     expose:
       - 5432
 
-  ams-redis:
+  redis:
     container_name: ams-redis
     image: redis:7.0
     ports:
@@ -59,9 +59,10 @@ services:
     image: hoonseung/asset-management:latest
 
     depends_on:
-      - ams-postgres
       - ams-redis
+      - ams-postgres
 
+    
     environment:
       - DB_USER=${DB_USER}
       - DB_PASSWORD=${DB_PASSWORD}
