@@ -62,6 +62,9 @@ services:
       - postgres
       - redis
 
+    command: [ "./wait-for-it.sh", "ams-postgres:5432", "--", "java", "-jar", "app.jar" ]
+    volumes:
+      - ./wait-for-it.sh:/wait-for-it.sh
     
     environment:
       - DB_USER=${DB_USER}
