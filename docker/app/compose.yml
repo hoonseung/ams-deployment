@@ -1,44 +1,4 @@
 services:
-  postgres:
-    container_name: ams-postgres
-    image: postgres:14.4
-    ports:
-      - "5432:5432"
-
-    restart: on-failure
-
-    environment:
-      - POSTGRES_USER=${POSTGRES_USER}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-      - POSTGRES_DB=${POSTGRES_DB}
-
-    volumes:
-      - pg_data:/var/lib/postgresql/data
-      - ./postgresql/init.sql:/docker-entrypoint-initdb.d/init.sql
-
-    networks:
-      - ams_network
-
-    expose:
-      - 5432
-
-  redis:
-    container_name: ams-redis
-    image: redis:7.0
-    ports:
-      - "6379:6379"
-
-    restart: on-failure
-
-    environment:
-      - ALLOW_EMPTY_PASSWORD=yes
-
-    volumes:
-      - redis_data:/data
-
-    networks:
-      - ams_network
-
 
   ams-front-app:
     container_name: ams-front
@@ -58,19 +18,15 @@ services:
     container_name: ams-backend
     image: hoonseung/asset-management:latest
 
-    depends_on:
-      - postgres
-      - redis
-
-    command: [ "./wait-for-it.sh", "ams-postgres:5432", "--", "java", "-jar", "app.jar" ]
-    volumes:
-      - ./wait-for-it.sh:/wait-for-it.sh
     
     environment:
       - DB_USER=${DB_USER}
       - DB_PASSWORD=${DB_PASSWORD}
       - DB_HOST=${DB_HOST}
       - DB_PORT=${DB_PORT}
+
+      - FORMAT_SQL=false
+      - SHOW_SQL=false
 
       - REDIS_HOST=${REDIS_HOST}
       - REDIS_PORT=${REDIS_PORT}
@@ -83,17 +39,14 @@ services:
       - JWT_ACCESS_EXPIRE=${JWT_ACCESS_EXPIRE}
       - JWT_REFRESH_EXPIRE=${JWT_REFRESH_EXPIRE}
 
+
+    volumes:
+      - /data/app/logs:/app/logs
+
     ports:
       - "8888:8888"
     networks:
       - ams_network
-    expose:
-      - 8888
-
-
-volumes:
-  pg_data:
-  redis_data:
 
 networks:
   ams_network:

@@ -1,0 +1,52 @@
+services:
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: ams-prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+    networks:
+      - ams-network
+
+  loki:
+    image: grafana/loki:2.9.4
+    container_name: ams-loki
+    ports:
+      - "3100:3100"
+    command: -config.file=/etc/loki/config.yml
+    volumes:
+      - ./loki/config.yml:/etc/loki/config.yml
+    networks:
+      - ams-network
+
+  promtail:
+    image: grafana/promtail:2.9.4
+    container_name: ams-promtail
+    volumes:
+      - ./promtail/config.yml:/etc/promtail/config.yml
+      - /data/system/logs:/var/log    # 호스트 로그 위치 (Linux 기준)
+      - /data/app/logs:/app/logs
+    command: -config.file=/etc/promtail/config.yml
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: ams-grafana
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana-storage:/var/lib/grafana
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    networks:
+      - ams-network
+
+
+volumes:
+  grafana-storage:
+
+networks:
+  ams-network:
+    external: true
